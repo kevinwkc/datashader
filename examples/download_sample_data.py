@@ -30,7 +30,6 @@ import glob
 import os
 import subprocess
 import sys
-sys.path.append(path.dirname(path.abspath(__file__))) # unzip_lidars import
 import tarfile
 import time
 import zipfile
@@ -177,15 +176,15 @@ class DirectoryContext(object):
         os.chdir(self.old_dir)
 
 
-def _unzip_7z(data_dir, fname, delete_7z=True):
+def _unzip_7z(fname, delete_7z=True):
     try:
         arc = Archive7z(open(fname, 'rb'))
-        print(arc)
     except:
         print('FAILED ON 7Z', fname)
         raise
     fnames = arc.filenames
     files = arc.files
+    data_dir = os.path.dirname(fname)
     for fn, fi in zip(fnames, files):
         gnd = os.path.join(data_dir, os.path.basename(fn))
         if not os.path.exists(os.path.dirname(gnd)):
@@ -246,7 +245,7 @@ def _process_dataset(dataset, output_dir, here):
             with zipfile.ZipFile(output_path, 'r') as zipf:
                 zipf.extractall()
             for f in glob.glob(path.join(here, 'data', '*.7z')):
-                tuple(_unzip_7z(f))
+                _unzip_7z(f)
             os.remove(output_path)
 
 
